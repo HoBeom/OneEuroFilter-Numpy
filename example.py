@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn
+from time import sleep
 from matplotlib.animation import FuncAnimation
 
 from one_euro_filter import OneEuroFilter
@@ -27,12 +28,14 @@ beta = 0.7
 x_hat = np.zeros_like(x_noisy)
 x_hat[0] = x_noisy[0]
 one_euro_filter = OneEuroFilter(
-    t[0], x_noisy[0],
+    x_noisy[0],
     min_cutoff=min_cutoff,
     beta=beta
 )
 for i in range(1, len(t)):
-    x_hat[i] = one_euro_filter(t[i], x_noisy[i])
+    sleep(0.1)
+    x_hat[i] = one_euro_filter(x_noisy[i])
+    print(x_hat[i])
 
 
 # The figure

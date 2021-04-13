@@ -1,12 +1,15 @@
-# 1€ Filter (One Euro Filter)
-A simple Python implementation of the 1€ Filter (1e filter, 1 euro filter, One Euro Filter). The code in [`one_euro_filter.py`](./one_euro_filter.py) can be used as pseudocode for implementing the algorithm in other languages. Detailed pseudocode about the underlying mathematics of the algorithm and sources can be found in a blog post that I wrote about it, [Noise Filtering Using 1€ Filter](https://jaantollander.com/post/noise-filtering-using-one-euro-filter/).
+# 1€ Filter (One Euro Filter)  
+A Python implementation of the 1€ Filter for **numpy vector** (1e filter, 1 euro filter, One Euro Filter). The original code is also available in [jaantollander](https://github.com/jaantollander/OneEuroFilter). 
+The code in [`one_euro_filter.py`](./one_euro_filter.py) can be used as numpy vector for implementing the real-time deep learning algorithm in python. 
+Detailed pseudocode about the underlying mathematics of the algorithm and sources can be found in a blog post that jaantollander wrote about it, [Noise Filtering Using 1€ Filter](https://jaantollander.com/post/noise-filtering-using-one-euro-filter/).
 
+## Source code
 ```python 
-import math
-
+import numpy as np
+from time import time
 
 def smoothing_factor(t_e, cutoff):
-    r = 2 * math.pi * cutoff * t_e
+    r = 2 * np.pi * cutoff * t_e
     return r / (r + 1)
 
 
@@ -15,21 +18,26 @@ def exponential_smoothing(a, x, x_prev):
 
 
 class OneEuroFilter:
-    def __init__(self, t0, x0, dx0=0.0, min_cutoff=1.0, beta=0.0,
+    def __init__(self, x0, dx0=0.0, min_cutoff=1.0, beta=0.0,
                  d_cutoff=1.0):
         """Initialize the one euro filter."""
         # The parameters.
-        self.min_cutoff = float(min_cutoff)
-        self.beta = float(beta)
-        self.d_cutoff = float(d_cutoff)
+        self.data_shape = x0.shape
+        self.min_cutoff = np.full(x0.shape, min_cutoff)
+        self.beta = np.full(x0.shape, beta)
+        self.d_cutoff = np.full(x0.shape, d_cutoff)
         # Previous values.
-        self.x_prev = float(x0)
-        self.dx_prev = float(dx0)
-        self.t_prev = float(t0)
+        self.x_prev = x0.astype(np.float)
+        self.dx_prev = np.full(x0.shape, dx0)
+        self.t_prev = time()
 
-    def __call__(self, t, x):
+    def __call__(self, x):
         """Compute the filtered signal."""
+        assert x.shape == self.data_shape
+
+        t = time()
         t_e = t - self.t_prev
+        t_e = np.full(x.shape, t_e)
 
         # The filtered derivative of the signal.
         a_d = smoothing_factor(t_e, self.d_cutoff)
@@ -37,7 +45,7 @@ class OneEuroFilter:
         dx_hat = exponential_smoothing(a_d, dx, self.dx_prev)
 
         # The filtered signal.
-        cutoff = self.min_cutoff + self.beta * abs(dx_hat)
+        cutoff = self.min_cutoff + self.beta * np.abs(dx_hat)
         a = smoothing_factor(t_e, cutoff)
         x_hat = exponential_smoothing(a, x, self.x_prev)
 
@@ -47,4 +55,19 @@ class OneEuroFilter:
         self.t_prev = t
 
         return x_hat
+```
+
+## Example code results.
+![image](./one_euro_filter.gif)
+
+```sh
+pip install seaborn matplotlib
+python example.py
+```
+
+## Cursor event example use
+
+```sh
+pip install tk
+python cursor_example.py
 ```
