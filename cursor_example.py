@@ -64,7 +64,8 @@ root.bind("<Motion>", motion)
 
 global canvas
 
-canvas = tk.Canvas(root)
+# https://stackoverflow.com/questions/40780634/tkinter-canvas-window-size
+canvas = tk.Canvas(root, width=1200, height=800, background="bisque")
 canvas.pack()
 
 # code from https://stackoverflow.com/questions/39840815/exiting-a-tkinter-app-with-ctrl-c-and-catching-sigint/51525592
