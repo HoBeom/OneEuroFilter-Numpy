@@ -61,12 +61,12 @@ class OneEuroFilter:
 ![image](./one_euro_filter.gif)
 
 ```sh
-pip install seaborn matplotlib
+pip install seaborn
 python example.py
 ```
 
 ## Cursor event example use
-
+![image](./euro_cursor.gif)
 ```sh
 pip install tk
 python cursor_example.py
